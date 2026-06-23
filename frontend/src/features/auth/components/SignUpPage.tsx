@@ -70,6 +70,7 @@ export default function SignUpPage() {
             <TextInput
               label="Email"
               placeholder="you@example.com"
+              autoComplete="email"
               required
               mb="md"
               {...register("email")}
@@ -78,6 +79,7 @@ export default function SignUpPage() {
             <TextInput
               label="Name"
               placeholder="Your name"
+              autoComplete="name"
               required
               mb="md"
               {...register("name")}
@@ -86,6 +88,7 @@ export default function SignUpPage() {
             <PasswordInput
               label="Password"
               placeholder="Min 8 chars, letter, number, special"
+              autoComplete="new-password"
               required
               mb={4}
               {...register("password")}
@@ -95,6 +98,7 @@ export default function SignUpPage() {
             <PasswordInput
               label="Confirm password"
               placeholder="Repeat your password"
+              autoComplete="new-password"
               required
               mt="md"
               mb="xl"

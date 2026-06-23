@@ -70,6 +70,7 @@ export default function SignInPage() {
             <TextInput
               label="Email"
               placeholder="you@example.com"
+              autoComplete="email"
               required
               mb="md"
               {...register("email")}
@@ -78,6 +79,7 @@ export default function SignInPage() {
             <PasswordInput
               label="Password"
               placeholder="Your password"
+              autoComplete="current-password"
               required
               mb="md"
               {...register("password")}

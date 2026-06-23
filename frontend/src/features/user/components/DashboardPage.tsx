@@ -1,4 +1,4 @@
-import { IconLogout } from '@tabler/icons-react';
+import { IconLogout } from "@tabler/icons-react";
 import {
   Alert,
   Button,
@@ -9,12 +9,12 @@ import {
   Paper,
   Text,
   Title,
-} from '@mantine/core';
-import { notifications } from '@mantine/notifications';
-import { useNavigate } from '@tanstack/react-router';
-import { useAuth } from '../../../context/useAuth';
-import { useLogout } from '../../auth/hooks/useLogout';
-import { useProfile } from '../hooks/useProfile';
+} from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { useNavigate } from "@tanstack/react-router";
+import { useAuth } from "../../../context/useAuth";
+import { useLogout } from "../../auth/hooks/useLogout";
+import { useProfile } from "../hooks/useProfile";
 
 export default function DashboardPage() {
   const { logout: clearAuth } = useAuth();
@@ -35,15 +35,15 @@ export default function DashboardPage() {
       onSuccess: async () => {
         await clearAuth();
         notifications.show({
-          color: 'blue',
-          title: 'Logged out',
-          message: 'You have been logged out successfully.',
+          color: "blue",
+          title: "Logged out",
+          message: "You have been logged out successfully.",
         });
-        navigate({ to: '/login' });
+        navigate({ to: "/login" });
       },
       onError: async () => {
         await clearAuth();
-        navigate({ to: '/login' });
+        navigate({ to: "/login" });
       },
     });
   };
@@ -57,10 +57,15 @@ export default function DashboardPage() {
               Error Loading Profile
             </Title>
             <Alert color="red" mb="xl">
-              {error instanceof Error ? error.message : 'Failed to load profile data'}
+              {error instanceof Error
+                ? error.message
+                : "Failed to load profile data"}
             </Alert>
             <Group justify="center">
-              <Button variant="default" onClick={() => window.location.reload()}>
+              <Button
+                variant="default"
+                onClick={() => window.location.reload()}
+              >
                 Retry
               </Button>
               <Button
@@ -83,17 +88,14 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
       <Container size={480}>
         <Paper withBorder shadow="md" p={40} radius="md" ta="center">
-          <Title order={2} mb="sm">
+          <Text c="dimmed" size="lg" mb="xs">
             Welcome to the application.
-          </Title>
-          {profile && (
-            <Text c="dimmed" mb="xs">
-              {profile.name} · {profile.email}
-            </Text>
-          )}
-          <Text c="dimmed" size="sm" mb="xl">
-            You are successfully authenticated.
           </Text>
+          {profile && (
+            <Title order={1} mb="xl">
+              {profile.name}
+            </Title>
+          )}
           <Group justify="center">
             <Button
               variant="light"
