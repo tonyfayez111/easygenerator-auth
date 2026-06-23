@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { authApi } from '../features/auth/api/authApi';
 import { setAccessToken } from '../api/axios';
+import { queryClient } from '../lib/queryClient';
 import { AuthContext } from './useAuth';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -37,6 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setToken(null);
       setAccessToken(null);
+      queryClient.clear();
     }
   }, []);
 
