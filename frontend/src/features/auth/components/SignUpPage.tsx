@@ -34,7 +34,7 @@ export default function SignUpPage() {
 
   const password = useWatch({ control, name: "password", defaultValue: "" });
 
-  const onSubmit = ({ confirmPassword: _, ...payload }: SignUpFormData) => {
+  const onSubmit = ({ confirmPassword: _confirmPassword, ...payload }: SignUpFormData) => {
     signUp.mutate(payload, {
       onSuccess: ({ access_token }) => {
         login(access_token);

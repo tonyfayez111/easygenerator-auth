@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as bcryptjs from 'bcryptjs';
-import { AppException, ErrorCode } from '../common/exceptions/app.exception';
+import { ErrorCode } from '../common/exceptions/app.exception';
 import { User } from '../user/schemas/user.schema';
 import { AuthService } from './auth.service';
 import { RefreshToken } from './schemas/refresh-token.schema';
