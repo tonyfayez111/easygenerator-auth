@@ -2,16 +2,22 @@ import {
   CallHandler,
   ExecutionContext,
   Injectable,
-  Logger,
   NestInterceptor,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { Observable, tap } from 'rxjs';
+import { createLogger, format, transports } from 'winston';
+
+const logger = createLogger({
+  format: format.combine(
+    format.timestamp(),
+    format.json(),
+  ),
+  transports: [new transports.Console()],
+});
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
-  private readonly logger = new Logger(LoggingInterceptor.name);
-
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const req = context.switchToHttp().getRequest<Request>();
     const { method, url } = req;
@@ -22,9 +28,11 @@ export class LoggingInterceptor implements NestInterceptor {
         const res = context
           .switchToHttp()
           .getResponse<{ statusCode: number }>();
-        this.logger.log(
-          `${method} ${url} ${res.statusCode} +${Date.now() - start}ms`,
-        );
+        logger.info({
+          message: `${method} ${url}`,
+          statusCode: res.statusCode,
+          durationMs: Date.now() - start,
+        });
       }),
     );
   }

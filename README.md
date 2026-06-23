@@ -8,7 +8,7 @@ Covers sign-up, sign-in, JWT access + refresh token rotation, Remember Me, slidi
 | Layer | Technology |
 |---|---|
 | Backend | NestJS · MongoDB · Passport.js · JWT |
-| Frontend | React 19 · Vite · Mantine v7 · TanStack Router · React Query |
+| Frontend | React 19 · Vite · Mantine v9 · TanStack Router · React Query |
 | Package manager | pnpm 11 |
 
 ---
@@ -170,7 +170,6 @@ easygenerator-auth/
 │   │   ├── auth/           # guards, strategies, DTOs, service, controller
 │   │   ├── user/           # user schema, controller
 │   │   ├── common/         # exceptions, filters, decorators, interceptors
-│   │   ├── mail/           # mail service (Resend integration, optional)
 │   │   └── app.module.ts
 │   └── test/               # e2e tests
 ├── frontend/
