@@ -1,73 +1,49 @@
-# React + TypeScript + Vite
+# Easygenerator Auth — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React 19 + Vite + TypeScript frontend for the Easygenerator authentication module.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **React 19** + **Vite**
+- **Mantine v9** — UI components
+- **Tailwind CSS v3** — layout and spacing
+- **TanStack Router** — file-based routing with auth guards
+- **TanStack Query** — server state and caching
+- **React Hook Form + Zod** — form validation
+- **Axios** — HTTP client with Bearer token interceptor and 401 refresh retry
 
-## React Compiler
+## Local setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm install
+pnpm dev        # http://localhost:5173
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The frontend expects the backend running at `http://localhost:3000` by default.
+To override, create a `.env` file:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```env
+VITE_API_URL=http://localhost:3000
+```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Available scripts
+
+```bash
+pnpm dev          # dev server with HMR
+pnpm build        # production build
+pnpm preview      # preview production build locally
+pnpm lint         # ESLint
+```
+
+## Project structure
+
+```
+src/
+├── api/              # Axios instance — withCredentials, Bearer interceptor, 401 retry
+├── context/          # AuthContext — in-memory access token + silent refresh
+├── features/
+│   ├── auth/         # sign-in, sign-up, hooks, API calls, Zod schemas
+│   └── user/         # dashboard page, profile hook
+├── lib/              # QueryClient config
+└── routes/           # TanStack Router file-based routes + auth guards
 ```
