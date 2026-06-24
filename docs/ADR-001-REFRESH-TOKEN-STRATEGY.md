@@ -4,9 +4,6 @@
 
 **Date:** 2026-06-23
 
-**Deciders:** 
-- Security Team
-- Backend Architecture Team
 
 ---
 
