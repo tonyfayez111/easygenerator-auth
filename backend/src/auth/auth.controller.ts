@@ -30,7 +30,7 @@ function setRefreshCookie(res: Response, token: string, rememberMe: boolean) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
-    path: '/auth/refresh',
+    path: '/auth',
     ...(rememberMe ? { maxAge: 7 * 24 * 60 * 60 * 1000 } : {}),
   });
 }
@@ -40,7 +40,7 @@ function clearRefreshCookie(res: Response) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
-    path: '/auth/refresh',
+    path: '/auth',
   });
 }
 

@@ -1,4 +1,11 @@
-import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  ForbiddenException,
+  Get,
+  Param,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { ApiAppResponses } from '../common/decorators/api-responses.decorator';
@@ -25,9 +32,11 @@ export class UserController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get user by ID' })
+  @ApiOperation({ summary: 'Get user by ID (own profile only)' })
   @ApiAppResponses(ErrorCode.USER_NOT_FOUND)
-  getById(@Param('id') id: string) {
+  getById(@Param('id') id: string, @Req() req: Request) {
+    const requester = req.user as { _id: { toString(): string } };
+    if (id !== requester._id.toString()) throw new ForbiddenException();
     return this.userService.findById(id);
   }
 }
