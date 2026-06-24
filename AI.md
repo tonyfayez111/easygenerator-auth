@@ -359,7 +359,86 @@ I verified MongoDB was included in the compose setup:
 > "is it creating container for mongo also so db can connect it?"
 
 I also noticed `VITE_API_URL` was being treated as a runtime environment variable in the
-Dockerfile, but Vite bakes env vars at build time — it needs to be a Docker build ARG,
-not an ENV. Claude updated the Dockerfile accordingly.
+Dockerfile, but Vite bakes env vars at build time — it needs to be a Docker build ARG.
+
+## Phase 5 — Security Review & Remediation
+      374 +
+      375 +### What triggered this phase
+      376 +
+      377 +After the full implementation was complete, I asked Claude to perform a dedicated security
+      378 +audit of the codebase before treating the project as done.
+      379 +
+      380 +### Prompts used
+      381 +
+      382 +> "do i have any vulnerabilities here or security issues? make a security review and tell me"
+      383 +
+      384 +> "need to solve the medium issues please"
+      385 +
+      386 +> "why we did not solve the get id instead of removing it?"
+      387 +
+      388 +> "but also i need to solve IDOR please"
+      389 +
+      390 +### What Claude generated
+      391 +
+      392 +**Security audit** — a full read of all security-relevant files (main.ts, auth.service.ts,
+      393 +auth.controller.ts, both strategies, refresh-token schema, user controller, DTOs, frontend
+      394 +axios interceptor, AuthContext) and a structured report with 8 findings across two severity
+      395 +levels:
+      396 +
+      397 +| Severity | Finding |
+      398 +|---|---|
+      399 +| MEDIUM | Rate limiting configured but ThrottlerGuard never registered — no brute-force protection |
+      400 +| MEDIUM | Logout did not revoke the DB refresh token (cookie path `/auth/refresh` never sent on POST `/auth/logout`) |
+      401 +| MEDIUM | IDOR on `GET /users/:id` — any authenticated user could read any other user's profile |
+
+      407 +
+      408 +**Fixes for all three MEDIUM issues:**
+      409 +
+      410 +1. **Rate limiting** — Added `{ provide: APP_GUARD, useClass: ThrottlerGuard }` to
+      411 +   `app.module.ts` providers and imported `APP_GUARD` from `@nestjs/core`. The
+      412 +   `ThrottlerModule.forRoot` config was always present but the guard was never wired in,
+      413 +   making it a no-op. Now enforces 10 req/60s globally across all routes.
+      414 +
+      415 +2. **Logout token revocation** — Changed the refresh cookie `path` from `/auth/refresh` to
+      416 +   `/auth` in both `setRefreshCookie` and `clearRefreshCookie` in `auth.controller.ts`.
+      417 +   Per RFC 6265, a browser only sends a cookie when the request path starts with the cookie's
+      418 +   path value — `/auth/logout` never matched `/auth/refresh`, so `rawToken` was always
+      419 +   `undefined` at the logout handler and `deleteOne` was silently skipped. Changing the path
+      420 +   to `/auth` covers both the refresh and logout endpoints without over-exposing the cookie.
+      421 +
+      422 +3. **IDOR** — Initially Claude removed `GET /users/:id` entirely as redundant (since
+      423 +   `GET /users/me` already exists). After human pushback, it was restored with an ownership
+      424 +   check: `if (id !== requester._id.toString()) throw new ForbiddenException()`. This
+      425 +   preserves the protected route while preventing any authenticated user from reading another
+      426 +   user's data by guessing ObjectIDs.
+      427 +
+      428 +### What was effective
+      429 +
+      430 +- A single open-ended prompt ("do I have any vulnerabilities?") triggered a thorough
+      431 +  multi-file audit that surfaced the non-obvious cookie path/logout revocation bug — a
+      432 +  flaw that passed all type checks and runtime tests but silently broke server-side token
+      433 +  revocation.
+      434 +- The structured severity table made it easy to triage and decide which issues to fix
+      435 +  immediately vs. note for later.
+      436 +
+      437 +### Human decisions / overrides
+      438 +
+      439 +- **IDOR approach:** Claude's first instinct was to remove `GET /users/:id` (no legitimate
+      440 +  use case, already covered by `/users/me`). The human overrode this — they wanted at least
+      441 +  one protected route with a parameterised ID to demonstrate the pattern. Claude then asked
+      442 +  for confirmation before restoring it, and added the ownership check as the actual IDOR fix.
+      443 +- **Low severity issues deferred:** The human chose to fix only the three MEDIUM findings.
+      444 +  The LOW issues (select: false, max password length, email enumeration, JWT secret strength,
+      445 +  token family invalidation) were documented but left for the evaluator to see as known
+      446 +  trade-offs rather than ignored problems.
+      447 +
+      448 +### What needed rework
+      449 +
+      450 +- The IDOR remediation required two iterations. Claude removed the endpoint first; human
+      451 +  pushed back; Claude then restored it with the ownership check. The correct outcome was
+      452 +  reached but it took an extra turn because Claude applied "remove the attack surface" too
+      453 +  aggressively without confirming with the human whether the endpoint was intentionally in scope.
+
+
 
 
